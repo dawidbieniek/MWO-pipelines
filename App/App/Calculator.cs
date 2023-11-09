@@ -2,16 +2,16 @@
 
 public class Calculator
 {
-    private float _a;
-    private float _b;
+    private int _a;
+    private int _b;
 
-    public Calculator(float a, float b)
+    public Calculator(int a, int b)
     {
         _a = a;
         _b = b;
     }
 
-    public float Add()
+    public int Add()
     {
         return _a + _b;
     }
