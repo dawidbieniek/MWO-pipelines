@@ -8,9 +8,11 @@ public class Program
 	{
 		var builder = WebApplication.CreateBuilder(args);
 		var app = builder.Build();
-
-		app.MapGet("/", () => $"!!!!!!!Wersja: {Assembly.GetExecutingAssembly().GetName().Version!}");
-
+#if DEBUG
+		app.MapGet("/", () => $"(DEV) Wersja: {Assembly.GetExecutingAssembly().GetName().Version!}");
+#else
+		app.MapGet("/", () => $"Wersja: {Assembly.GetExecutingAssembly().GetName().Version!}");
+#endif
 		app.MapGet("/add", (HttpContext httpContext) =>
 		{
 			var a = httpContext.Request.Query["a"].ToString();
