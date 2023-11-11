@@ -9,7 +9,7 @@ public class Program
 		var builder = WebApplication.CreateBuilder(args);
 		var app = builder.Build();
 
-		app.MapGet("/", () => $"Wersja: {Assembly.GetExecutingAssembly().GetName().Version!}");
+		app.MapGet("/", () => $"!!!!!!!Wersja: {Assembly.GetExecutingAssembly().GetName().Version!}");
 
 		app.MapGet("/add", (HttpContext httpContext) =>
 		{
