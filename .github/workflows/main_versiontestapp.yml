@@ -30,8 +30,6 @@ jobs:
             $newVersion = $versionComponents -join '.'
             $csproj.Project.PropertyGroup.Version = $newVersion
             $csproj.Save("App/App.csproj")
-      - name: Display version
-        run: cat App/App.csproj
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
@@ -65,8 +63,6 @@ jobs:
             $newVersion = $versionComponents -join '.'
             $csproj.Project.PropertyGroup.Version = $newVersion
             $csproj.Save("App/App.csproj")
-      - name: Display version
-        run: cat App/App.csproj
 
       - name: Build with dotnet
         run: dotnet build --configuration Debug
