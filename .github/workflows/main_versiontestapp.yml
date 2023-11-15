@@ -25,8 +25,9 @@ jobs:
       - name: Increment version
         run: |
             [xml]$csproj = Get-Content -Path "App/App.csproj"
-            $oldVersion = $csproj.Project.PropertyGroup.Version
-            $newVersion = $env:GITHUB_RUN_NUMBER
+            $versionComponents = $csproj.Project.PropertyGroup.Version -split '\.'
+            $versionComponents[-1] = $env:GITHUB_RUN_NUMBER
+            $newVersion = $versionComponents -join '.'
             $csproj.Project.PropertyGroup.Version = $newVersion
             $csproj.Save("App/App.csproj")
       - name: Display version
