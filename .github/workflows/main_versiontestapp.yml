@@ -45,6 +45,41 @@ jobs:
           name: .net-app
           path: ${{env.DOTNET_ROOT}}/myapp
 
+  build-dev:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '8.x'
+          include-prerelease: true
+
+      - name: Increment version
+        run: |
+            [xml]$csproj = Get-Content -Path "App/App.csproj"
+            $versionComponents = $csproj.Project.PropertyGroup.Version -split '\.'
+            $versionComponents[-1] = $env:GITHUB_RUN_NUMBER
+            $newVersion = $versionComponents -join '.'
+            $csproj.Project.PropertyGroup.Version = $newVersion
+            $csproj.Save("App/App.csproj")
+      - name: Display version
+        run: cat App/App.csproj
+
+      - name: Build with dotnet
+        run: dotnet build --configuration Debug
+
+      - name: dotnet publish
+        run: dotnet publish -c Debug -o ${{env.DOTNET_ROOT}}/myapp-dev
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v3
+        with:
+          name: .net-app-dev
+          path: ${{env.DOTNET_ROOT}}/myapp-dev
+
   deploy:
     runs-on: windows-latest
     needs: build
@@ -65,4 +100,26 @@ jobs:
           app-name: 'VersionTestApp'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_CC295E74985F498C8B3A06995AD6A7C1 }}
+          package: .
+
+  deploy-dev:
+    runs-on: windows-latest
+    needs: build-dev
+    environment:
+      name: 'Production'
+      url: ${{ steps.deploy-to-webapp-dev.outputs.webapp-url }}
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v3
+        with:
+          name: .net-app-dev
+
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp-dev
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'VersionTestApp-dev'
+          slot-name: 'Production'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_42A7D92F466E4490828623989EE33132 }}
           package: .
