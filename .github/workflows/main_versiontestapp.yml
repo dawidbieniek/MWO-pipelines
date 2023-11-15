@@ -22,6 +22,16 @@ jobs:
           dotnet-version: '8.x'
           include-prerelease: true
 
+      - name: Increment version
+        run: |
+            [xml]$csproj = Get-Content -Path "App/App.csproj"
+            $oldVersion = $csproj.Project.PropertyGroup.Version
+            $newVersion = $env:GITHUB_RUN_NUMBER
+            $csproj.Project.PropertyGroup.Version = $newVersion
+            $csproj.Save("App/App.csproj")
+      - name: Display version
+        run: cat App/App.csproj
+
       - name: Build with dotnet
         run: dotnet build --configuration Release
 
